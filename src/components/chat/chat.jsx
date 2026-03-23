@@ -4,7 +4,7 @@ import Linkify from "react-linkify";
 import { SecureLink } from "react-secure-link";
 import { CSSTransition, TransitionGroup } from "react-transition-group";
 
-import styles from "./Chat.module.css";
+import styles from "./chat.module.css";
 import {
   formatTimestamp,
   getColorForStringHex,
