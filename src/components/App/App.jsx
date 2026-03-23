@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState, useRef, useContext } from "react";
 import { TextInput, ActionIcon, Tabs, Badge } from "@mantine/core";
 import { isYouTube } from "../../utils/utils";
-import { Chat } from "../chat/Chat";
+import { Chat } from "../chat/chat";
 import { TopBar } from "../TopBar/TopBar";
 import { Controls } from "../Controls/Controls";
 import { SettingsModal } from "../Settings/SettingsModal";
