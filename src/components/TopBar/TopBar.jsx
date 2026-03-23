@@ -1,54 +1,33 @@
-import React, { useCallback, useContext, useState, useEffect } from "react";
-import { serverPath, getUserImage, softWhite } from "../../utils/utils";
-import { ActionIcon, Avatar, Button, Menu, Text } from "@mantine/core";
+import React, { useCallback, useContext, useEffect, useState } from "react";
+import { softWhite } from "../../utils/utils";
+import { Avatar, Button, Text } from "@mantine/core";
 import { LoginModal } from "../Modal/LoginModal";
 import { SubscribeButton } from "../SubscribeButton/SubscribeButton";
 import { ProfileModal } from "../Modal/ProfileModal";
 import Announce from "../Announce/Announce";
 import appStyles from "../App/App.module.css";
 import { MetadataContext } from "../../MetadataContext";
-import {
-  IconBrandDiscord,
-  IconBrandGithub,
-  IconCirclePlusFilled,
-  IconDatabase,
-  IconLogin,
-  IconTrash,
-} from "@tabler/icons-react";
+import { IconCirclePlusFilled, IconLogin } from "@tabler/icons-react";
+
+function generateRoomId() {
+  return Math.random().toString(36).substring(2, 10);
+}
 
 export async function createRoom(user, openNewTab, video = "") {
-  const uid = user?.uid;
-  // Note: Firebase getIdToken removed. 
-  // If using a custom backend, you may need to pass a different auth header here.
-  const response = await fetch(serverPath + "/createRoom", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      uid,
-      video,
-    }),
-  });
-  
-  const data = await response.json();
-  const { name } = data;
-  
+  const roomId = generateRoomId();
+  const path = "/watch/" + roomId;
   if (openNewTab) {
-    window.open("/watch" + name);
+    window.open(path);
   } else {
-    window.location.assign("/watch" + name);
+    window.location.assign(path);
   }
 }
 
-/**
- * New Room Button Component
- */
 export const NewRoomButton = ({ size, openNewTab }) => {
   const context = useContext(MetadataContext);
-  
-  const onClick = useCallback(async () => {
-    await createRoom(context.user, openNewTab);
+
+  const onClick = useCallback(() => {
+    createRoom(context.user, openNewTab);
   }, [context.user, openNewTab]);
 
   return (
@@ -56,15 +35,18 @@ export const NewRoomButton = ({ size, openNewTab }) => {
       size={size}
       onClick={onClick}
       leftSection={<IconCirclePlusFilled />}
+      style={{
+        background: "linear-gradient(135deg, #38bdf8, #34d399)",
+        color: "#000",
+        fontWeight: 700,
+        border: "none",
+      }}
     >
       New Room
     </Button>
   );
 };
 
-/**
- * Sign In Button Component
- */
 export const SignInButton = () => {
   const context = useContext(MetadataContext);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
@@ -74,8 +56,13 @@ export const SignInButton = () => {
   useEffect(() => {
     const fetchImage = async () => {
       if (context.user) {
-        const img = await getUserImage(context.user);
-        setUserImage(img);
+        try {
+          const { getUserImage } = await import("../../utils/utils");
+          const img = await getUserImage(context.user);
+          setUserImage(img);
+        } catch (e) {
+          console.warn("Could not fetch user image", e);
+        }
       }
     };
     fetchImage();
@@ -83,243 +70,60 @@ export const SignInButton = () => {
 
   if (context.user) {
     return (
-      <div
-        style={{
-          margin: "4px",
-          minWidth: "40px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          cursor: "pointer",
-        }}
-      >
-        <Avatar
-          src={userImage}
-          onClick={() => setIsProfileOpen(true)}
-        />
-        {isProfileOpen && (
-          <ProfileModal
-            userImage={userImage}
-            close={() => setIsProfileOpen(false)}
-          />
-        )}
+      <div style={{ margin: "4px", minWidth: "40px", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
+        <Avatar src={userImage} onClick={() => setIsProfileOpen(true)} />
+        {isProfileOpen && <ProfileModal userImage={userImage} close={() => setIsProfileOpen(false)} />}
       </div>
     );
   }
 
   return (
     <React.Fragment>
-      {isLoginOpen && (
-        <LoginModal closeModal={() => setIsLoginOpen(false)} />
-      )}
-      <Button
-        leftSection={<IconLogin />}
-        onClick={() => setIsLoginOpen(true)}
-      >
+      {isLoginOpen && <LoginModal closeModal={() => setIsLoginOpen(false)} />}
+      <Button variant="subtle" leftSection={<IconLogin />} onClick={() => setIsLoginOpen(true)} style={{ color: "#94a3b8" }}>
         Sign in
       </Button>
     </React.Fragment>
   );
 };
 
-/**
- * List Rooms Button Component
- */
-export const ListRoomsButton = () => {
-  const context = useContext(MetadataContext);
-  const [rooms, setRooms] = useState([]);
-
-  const refreshRooms = useCallback(async () => {
-    if (context.user) {
-      const response = await fetch(
-        serverPath + `/listRooms?uid=${context.user.uid}`
-      );
-      setRooms(await response.json());
-    }
-  }, [context.user]);
-
-  useEffect(() => {
-    refreshRooms();
-  }, [refreshRooms]);
-
-  const deleteRoom = async (roomId) => {
-    if (context.user) {
-      await fetch(
-        serverPath + `/deleteRoom?uid=${context.user.uid}&roomId=${roomId}`,
-        { method: "DELETE" }
-      );
-      setRooms((prev) => prev.filter((room) => room.roomId !== roomId));
-      refreshRooms();
-    }
-  };
-
-  return (
-    <Menu shadow="md" width={200}>
-      <Menu.Target>
-        <Button
-          color="gray"
-          onClick={refreshRooms}
-          leftSection={<IconDatabase />}
-        >
-          My rooms
-        </Button>
-      </Menu.Target>
-      <Menu.Dropdown>
-        {rooms.length === 0 && (
-          <Menu.Item disabled>You have no permanent rooms.</Menu.Item>
-        )}
-        {rooms.map((room) => (
-          <Menu.Item
-            key={room.roomId}
-            component="a"
-            href={room.vanity ? "/r/" + room.vanity : "/watch" + room.roomId}
-          >
-            <div style={{ display: "flex", alignItems: "center", width: "100%" }}>
-              <div style={{ flex: 1 }}>
-                <Text size="sm">
-                  {room.vanity ? `/r/${room.vanity}` : `/watch${room.roomId}`}
-                </Text>
-                <Text size="xs" color="dimmed">
-                  {room.roomId}
-                </Text>
-              </div>
-              <ActionIcon
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  deleteRoom(room.roomId);
-                }}
-                color="red"
-                variant="subtle"
-              >
-                <IconTrash size={16} />
-              </ActionIcon>
-            </div>
-          </Menu.Item>
-        ))}
-      </Menu.Dropdown>
-    </Menu>
-  );
-};
-
-/**
- * Main TopBar Component
- */
-export const TopBar = ({
-  hideNewRoom,
-  hideSignin,
-  hideMyRooms,
-  roomTitle,
-  roomDescription,
-  roomTitleColor,
-}) => {
-  const context = useContext(MetadataContext);
-
+export const TopBar = ({ hideNewRoom, hideSignin, roomTitle, roomDescription, roomTitleColor }) => {
   return (
     <div
       style={{
         display: "flex",
         flexWrap: "wrap",
-        padding: "4px 8px",
-        rowGap: "8px",
+        padding: "0 16px",
+        height: "64px",
         alignItems: "center",
+        background: "#0d1117",
+        borderBottom: "1px solid #1f2937",
+        position: "sticky",
+        top: 0,
+        zIndex: 100,
       }}
     >
-      <a href="/" style={{ display: "flex" }}>
-        <img
-          style={{ width: "56px", height: "56px" }}
-          src="/logo192.png"
-          alt="Logo"
-        />
+      <a href="/" style={{ display: "flex", alignItems: "center", gap: "10px", textDecoration: "none" }}>
+        <img style={{ width: "36px", height: "36px" }} src="/logo192.png" alt="Logo" />
+        {!roomTitle && (
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <span style={{ fontFamily: "'Syne', sans-serif", fontWeight: 800, color: "#38bdf8", fontSize: "22px" }}>Watch</span>
+            <span style={{ fontFamily: "'Syne', sans-serif", fontWeight: 800, color: "#34d399", fontSize: "22px", marginLeft: "2px" }}>Party</span>
+          </div>
+        )}
       </a>
 
-      {roomTitle || roomDescription ? (
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-            margin: "0 10px",
-          }}
-        >
-          <div
-            style={{
-              fontSize: "30px",
-              lineHeight: "30px",
-              color: roomTitleColor || softWhite,
-              fontWeight: 700,
-              letterSpacing: 1,
-            }}
-          >
-            {roomTitle?.toUpperCase()}
-          </div>
-          <Text size="sm">{roomDescription}</Text>
+      {(roomTitle || roomDescription) && (
+        <div style={{ marginLeft: "12px" }}>
+          <div style={{ fontSize: "18px", fontWeight: 700, color: roomTitleColor || softWhite }}>{roomTitle}</div>
+          {roomDescription && <Text size="xs" style={{ color: "#94a3b8" }}>{roomDescription}</Text>}
         </div>
-      ) : (
-        <a href="/" style={{ display: "flex", textDecoration: "none" }}>
-          <div style={{ display: "flex", alignItems: "center" }}>
-            <div
-              style={{
-                textTransform: "uppercase",
-                fontWeight: 700,
-                color: "#2185d0",
-                fontSize: "30px",
-              }}
-            >
-              Watch
-            </div>
-            <div
-              style={{
-                textTransform: "uppercase",
-                fontWeight: 700,
-                color: "#21ba45",
-                fontSize: "30px",
-                marginLeft: "4px",
-              }}
-            >
-              Party
-            </div>
-          </div>
-        </a>
       )}
 
       <Announce />
 
-      <div
-        className={appStyles.mobileStack}
-        style={{
-          display: "flex",
-          marginLeft: "auto",
-          alignItems: "center",
-          gap: "8px",
-        }}
-      >
-        <div style={{ display: "flex", gap: "4px" }}>
-          <ActionIcon
-            component="a"
-            color="gray"
-            size="lg"
-            href="https://discord.gg/3rYj5HV"
-            target="_blank"
-            rel="noopener noreferrer"
-            variant="subtle"
-          >
-            <IconBrandDiscord />
-          </ActionIcon>
-          <ActionIcon
-            component="a"
-            color="gray"
-            size="lg"
-            href="https://github.com/howardchung/watchparty"
-            target="_blank"
-            rel="noopener noreferrer"
-            variant="subtle"
-          >
-            <IconBrandGithub />
-          </ActionIcon>
-        </div>
-        {!hideNewRoom && <NewRoomButton openNewTab />}
-        {!hideMyRooms && context.user && <ListRoomsButton />}
+      <div className={appStyles.mobileStack} style={{ display: "flex", marginLeft: "auto", alignItems: "center", gap: "8px" }}>
+        {!hideNewRoom && <NewRoomButton openNewTab={false} />}
         <SubscribeButton />
         {!hideSignin && <SignInButton />}
       </div>

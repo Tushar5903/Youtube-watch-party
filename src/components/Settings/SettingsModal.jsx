@@ -25,7 +25,7 @@ import {
   IconTrash,
   IconX,
 } from "@tabler/icons-react";
-import styles from "./Settings.modal.css";
+import "./Settings.Modal.css";
 
 const defaultRoomTitleColor = "#FFFFFF";
 const roomTitleMaxCharLength = 50;
@@ -64,18 +64,16 @@ export const SettingsModal = ({
 
   const setRoomState = useCallback(
     async (data) => {
-      socket.emit("CMD:setRoomState", {
-        ...data,
-      });
+      if (!socket) return;
+      socket.emit("CMD:setRoomState", { ...data });
     },
     [socket]
   );
 
   const setRoomOwner = useCallback(
     async (data) => {
-      socket.emit("CMD:setRoomOwner", {
-        ...data,
-      });
+      if (!socket) return;
+      socket.emit("CMD:setRoomOwner", { ...data });
     },
     [socket]
   );
@@ -95,7 +93,7 @@ export const SettingsModal = ({
         if (
           data &&
           data.vanity &&
-          data.vanity !== roomLink.split("/").slice(-1)[0]
+          data.vanity !== roomLink?.split("/").slice(-1)[0]
         ) {
           setValidVanity(false);
         } else {
@@ -124,7 +122,7 @@ export const SettingsModal = ({
         title="Settings"
       >
         <div>
-          <div className={styles.sectionHeader}>Room Settings</div>
+          <div className="sectionHeader">Room Settings</div>
           <SettingRow
             toggle
             name="Lock Room"
@@ -151,7 +149,7 @@ export const SettingsModal = ({
           />
 
           <Divider my="lg" />
-          <div className={styles.sectionHeader}>Local Settings</div>
+          <div className="sectionHeader">Local Settings</div>
           <SettingRow
             toggle
             updateTS={updateTS}
@@ -172,7 +170,7 @@ export const SettingsModal = ({
         </div>
 
         <Divider my="lg" />
-        <div className={styles.sectionHeader}>Permanent Room Settings</div>
+        <div className="sectionHeader">Permanent Room Settings</div>
         {!owner && (
           <Alert color="yellow">
             The room must be permanent to modify these settings.
@@ -231,7 +229,7 @@ export const SettingsModal = ({
               disabled={false}
               content={
                 <div style={{ display: "flex", gap: "14px" }}>
-                  <ActionIcon color="red" size="lg" onClick={() => clearChat()}>
+                  <ActionIcon color="red" size="lg" onClick={() => clearChat?.()}>
                     <IconTrash />
                   </ActionIcon>
                   <div>

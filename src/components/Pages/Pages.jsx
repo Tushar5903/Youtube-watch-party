@@ -4,12 +4,13 @@ const mdStyle = {
   maxWidth: "100vw",
   width: "800px",
   padding: "10px",
+  margin:'auto',
 };
 
 export const Privacy = () => {
   return (
     <div style={mdStyle}>
-      <pre style={{ whiteSpace: "pre-wrap", fontFamily: 'inherit' }}>
+      <pre style={{ whiteSpace: "pre-wrap", fontFamily: 'inherit', textAlign: 'center' }}>
         {`
 Privacy Policy
 ====
@@ -25,7 +26,7 @@ Personal Information
 - You are not required to register to use the service, but you have the option to sign in with an email or authentication provider, which will be used to display your name and picture in the rooms you join.
 - If you provide this information, we may use it to contact you regarding your use of the service, or to link your account to a subscription.
 - We do not sell personal information to third parties.
-- You have the right to request deletion of your user data, in accordance with various laws governing data protection. Please contact support@watchparty.me to request user data deletion.
+- You have the right to request deletion of your user data, in accordance with various laws governing data protection. Please contact tushar0509@gmail.com to request user data deletion.
 - Payment information is handled by providers such as Stripe. We do not collect or access financial information directly.
 
 Cookies
@@ -39,7 +40,7 @@ Virtual Browsers
 
 YouTube
 ----
-- The service provides the ability to search and play YouTube videos. Google/YouTube may use data provided to the search service in accordance with the [Google Privacy Policy](https://policies.google.com/privacy).
+- The service provides the ability to search and play YouTube videos. Google/YouTube may use data provided to the search service in accordance with the Google Privacy Policy.
 `}
       </pre>
     </div>
@@ -49,7 +50,7 @@ YouTube
 export const Terms = () => {
   return (
     <div style={mdStyle}>
-      <pre style={{ whiteSpace: "pre-wrap", fontFamily: 'inherit' }}>
+      <pre style={{ whiteSpace: "pre-wrap", fontFamily: 'inherit',textAlign:'center' }}>
         {`
 Terms of Service
 ====
@@ -61,12 +62,12 @@ By using this service you agree to the following terms:
 
 Subscriptions
 ----
-- If you are dissatisfied with the service for any reason or believe you have been charged in error, please contact support@watchparty.me.
+- If you are dissatisfied with the service for any reason or believe you have been charged in error, please contact tusharkumar0509@gmail.com.
 - We will provide a full refund of the most recent payment, no questions asked.
 
 YouTube
 ----
-The service provides the ability to search and play YouTube videos. By using the YouTube search you agree to the [YouTube Terms of Service](https://www.youtube.com/t/terms).
+The service provides the ability to search and play YouTube videos. By using the YouTube search you agree to the YouTube Terms of Service.
 `}
       </pre>
     </div>
@@ -76,7 +77,7 @@ The service provides the ability to search and play YouTube videos. By using the
 export const FAQ = () => {
   return (
     <div style={mdStyle}>
-      <pre style={{ whiteSpace: "pre-wrap", fontFamily: 'inherit' }}>
+      <pre style={{ whiteSpace: "pre-wrap", fontFamily: 'inherit', textAlign:'center' }}>
         {`
 FAQ
 ====
@@ -105,9 +106,6 @@ Is there a limit to how many people can be in a room?
 ----
 Currently there isn't a hard limit, although the service hasn't been tested with more than 15 people or so. Screensharing and filesharing rely on one person uploading to everyone else, so it may not work well with large room sizes.
 
-I own a website and I'd like to have a link that generates a WatchParty room with a specific video already set. How do I do this?
-----
-You can link to https://www.watchparty.me/create?video=URL_HERE to do this!
 
 `}
       </pre>

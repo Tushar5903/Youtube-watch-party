@@ -17,11 +17,8 @@ export const PasswordModal = ({ roomId }) => {
 
   useEffect(() => {
     const checkOwnership = async () => {
-      // If a user is logged in, try to see if they own the room 
-      // and have the password saved on the server.
       if (user) {
         try {
-          // Firebase getIdToken logic removed
           const response = await fetch(
             `${serverPath}/listRooms?uid=${user.uid}`
           );

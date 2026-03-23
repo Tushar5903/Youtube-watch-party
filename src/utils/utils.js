@@ -1,31 +1,50 @@
 import canAutoplay from "can-autoplay";
-import { MD5 } from "./md5";
-import config from "../config";
-import { cyrb53 } from "./hash";
 
-/**
- * Time and Unit Formatting
- */
+// Safe config fallback
+const config = {
+  VITE_SERVER_HOST: import.meta.env?.VITE_SERVER_HOST || "",
+  NODE_ENV: import.meta.env?.MODE || "development",
+};
+
+// MD5 fallback for Gravatar
+const MD5 = {
+  hash: (str) => {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      const char = str.charCodeAt(i);
+      hash = (hash << 5) - hash + char;
+      hash = hash & hash;
+    }
+    return Math.abs(hash).toString(16).padStart(32, "0");
+  },
+};
+
+// cyrb53 hash inline
+const cyrb53 = (str, seed = 0) => {
+  let h1 = 0xdeadbeef ^ seed,
+    h2 = 0x41c6ce57 ^ seed;
+  for (let i = 0, ch; i < str.length; i++) {
+    ch = str.charCodeAt(i);
+    h1 = Math.imul(h1 ^ ch, 2654435761);
+    h2 = Math.imul(h2 ^ ch, 1597334677);
+  }
+  h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507);
+  h1 ^= Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+  h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507);
+  h2 ^= Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+  return 4294967296 * (2097151 & h2) + (h1 >>> 0);
+};
+
 export function formatTimestamp(input, zeroTime) {
-  if (
-    input === null ||
-    input === undefined ||
-    input === false ||
-    Number.isNaN(input) ||
-    input === Infinity
-  ) {
+  if (input === null || input === undefined || input === false || Number.isNaN(input) || input === Infinity) {
     return "";
   }
   if (zeroTime) {
     return new Date((zeroTime + input) * 1000).toLocaleTimeString();
   }
   let hours = Math.abs(Math.trunc(Number(input) / 3600));
-  let minutes = Math.abs(Math.trunc(Number(input) / 60) % 60)
-    .toString()
-    .padStart(2, "0");
-  let seconds = Math.abs(Math.trunc(Number(input) % 60))
-    .toString()
-    .padStart(2, "0");
+  let minutes = Math.abs(Math.trunc(Number(input) / 60) % 60).toString().padStart(2, "0");
+  let seconds = Math.abs(Math.trunc(Number(input) % 60)).toString().padStart(2, "0");
   return `${Number(input) < 0 ? "-" : ""}${hours ? `${hours}:` : ""}${minutes}:${seconds}`;
 }
 
@@ -42,9 +61,6 @@ export function formatSize(input) {
   return input + " B";
 }
 
-/**
- * UI & Colors
- */
 export const colorMappings = {
   red: "B03060",
   orange: "FE9A76",
@@ -74,10 +90,7 @@ export function getColorForStringHex(id) {
   return colorMappings[getColorForString(id)];
 }
 
-/**
- * Media Source Checkers
- */
-export const isYouTube = (input) => 
+export const isYouTube = (input) =>
   input.startsWith("https://www.youtube.com/") || input.startsWith("https://youtu.be/");
 
 export const isHttp = (input) => input.startsWith("http");
@@ -89,9 +102,6 @@ export const isScreenShare = (input) => input.startsWith("screenshare://");
 export const isFileShare = (input) => input.startsWith("fileshare://");
 export const isVBrowser = (input) => input.startsWith("vbrowser://");
 
-/**
- * System Utilities
- */
 export async function testAutoplay() {
   const result = await canAutoplay.video();
   return result.result;
@@ -123,9 +133,6 @@ export function shuffle(array) {
   }
 }
 
-/**
- * Network & Pathing
- */
 export const serverPath =
   config.VITE_SERVER_HOST ||
   `${window.location.protocol}//${
@@ -143,9 +150,6 @@ export const iceServers = () => [
   { urls: "turn:5.223.48.157:3478", username: "username", credential: "password" },
 ];
 
-/**
- * API Fetching
- */
 export async function getMediaPathResults(mediaPath, query) {
   let results = [];
   if (mediaPath.startsWith("https://www.youtube.com/playlist?list=")) {
@@ -155,9 +159,7 @@ export async function getMediaPathResults(mediaPath, query) {
   } else {
     const response = await fetch(mediaPath);
     const text = await response.text();
-    results = text
-      .split("\n")
-      .map((line) => ({ url: line, name: line, duration: 0, type: "file" }));
+    results = text.split("\n").map((line) => ({ url: line, name: line, duration: 0, type: "file" }));
   }
   return results.filter((res) => res.url);
 }
@@ -167,10 +169,7 @@ export async function getStreamPathResults(streamPath, query) {
     streamPath + `/${query ? "search" : "top"}?q=` + encodeURIComponent(query)
   );
   const data = await response.json();
-  return data.map((d, i) => ({
-    ...d,
-    url: d.magnet ?? String(i),
-  }));
+  return data.map((d, i) => ({ ...d, url: d.magnet ?? String(i) }));
 }
 
 export async function getYouTubeResults(query) {
@@ -179,9 +178,6 @@ export async function getYouTubeResults(query) {
   return data.map((d) => ({ ...d, type: "youtube" }));
 }
 
-/**
- * Local Storage & Auth Helpers
- */
 export async function openFileSelector(accept) {
   return new Promise((resolve) => {
     const inputElement = document.createElement("input");
@@ -225,10 +221,6 @@ export function getSavedPasswords() {
   }
 }
 
-/**
- * Logic previously dependent on Firebase
- * Simplified to use a generic user object
- */
 export async function getUserImage(user) {
   if (!user) return null;
   const hash = user.email ? MD5.hash(user.email) : "";
@@ -241,9 +233,6 @@ export async function getUserImage(user) {
   return `https://www.gravatar.com/avatar/${hash}?d=identicon`;
 }
 
-/**
- * Math & Misc
- */
 export function createUuid() {
   return crypto.randomUUID ? crypto.randomUUID() : uuidv4();
 }

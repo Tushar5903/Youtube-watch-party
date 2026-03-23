@@ -9,11 +9,6 @@ import {
 } from "@mantine/core";
 import firebase from "firebase/compat/app";
 import "firebase/compat/auth";
-import {
-  IconBrandFacebookFilled,
-  IconBrandGoogleFilled,
-} from "@tabler/icons-react";
-import config from "../../config";
 
 export const LoginModal = ({ closeModal }) => {
   const [email, setEmail] = useState("");
@@ -32,28 +27,6 @@ export const LoginModal = ({ closeModal }) => {
     }
   };
 
-  const facebookSignIn = async () => {
-    const provider = new firebase.auth.FacebookAuthProvider();
-    try {
-      await firebase.auth().signInWithPopup(provider);
-      closeModal();
-    } catch (e) {
-      setError(e.message);
-    }
-  };
-
-  const googleSignIn = async () => {
-    const provider = new firebase.auth.GoogleAuthProvider();
-    try {
-      await firebase.auth().signInWithPopup(provider);
-      closeModal();
-    } catch (e) {
-      setError(e.message);
-    }
-  };
-
-  const enabledOptions = config.VITE_FIREBASE_SIGNIN_METHODS.split(",");
-
   return (
     <>
       {showCreate && (
@@ -62,89 +35,61 @@ export const LoginModal = ({ closeModal }) => {
       {showReset && (
         <ResetModal closeModal={() => setShowReset(false)} />
       )}
-      
+
       <Modal opened onClose={closeModal} title="Login" size="auto" centered>
         <div>
-          <div style={{ display: "flex", gap: "4px" }}>
-            {enabledOptions.includes("facebook") && (
-              <Button
-                leftSection={<IconBrandFacebookFilled />}
-                onClick={facebookSignIn}
-              >
-                Facebook
-              </Button>
+          <form
+            onSubmit={emailSignIn}
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "8px",
+            }}
+          >
+            {error && (
+              <Alert color="red" title="Error">
+                {error}
+              </Alert>
             )}
-            {enabledOptions.includes("google") && (
-              <Button
-                leftSection={<IconBrandGoogleFilled />}
-                onClick={googleSignIn}
-              >
-                Google
-              </Button>
-            )}
-          </div>
+            <TextInput
+              label="Email"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+            <PasswordInput
+              label="Password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <Button type="submit">Login</Button>
+          </form>
 
-          {enabledOptions.includes("email") && (
-            <>
-              <Divider
-                label="Or sign in with email"
-                labelPosition="center"
-                my="lg"
-              />
-              <form
-                onSubmit={emailSignIn}
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "8px",
-                }}
-              >
-                {error && (
-                  <Alert color="red" title="Error">
-                    {error}
-                  </Alert>
-                )}
-                <TextInput
-                  label="Email"
-                  placeholder="Email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-                <PasswordInput
-                  label="Password"
-                  placeholder="Password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-                <Button type="submit">Login</Button>
-              </form>
-              
-              <Divider label="Or" labelPosition="center" my="lg" />
-              
-              <div
-                style={{
-                  display: "flex",
-                  gap: "4px",
-                  justifyContent: "center",
-                }}
-              >
-                <Button
-                  variant="subtle"
-                  size="xs"
-                  onClick={() => setShowCreate(true)}
-                >
-                  Create account
-                </Button>
-                <Button
-                  variant="subtle"
-                  size="xs"
-                  onClick={() => setShowReset(true)}
-                >
-                  Reset password
-                </Button>
-              </div>
-            </>
-          )}
+          <Divider label="Or" labelPosition="center" my="lg" />
+
+          <div
+            style={{
+              display: "flex",
+              gap: "4px",
+              justifyContent: "center",
+            }}
+          >
+            <Button
+              variant="subtle"
+              size="xs"
+              onClick={() => setShowCreate(true)}
+            >
+              Create account
+            </Button>
+            <Button
+              variant="subtle"
+              size="xs"
+              onClick={() => setShowReset(true)}
+            >
+              Reset password
+            </Button>
+          </div>
         </div>
       </Modal>
     </>

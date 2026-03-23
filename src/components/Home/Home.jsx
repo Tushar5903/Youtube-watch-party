@@ -1,7 +1,5 @@
 import React, { useContext } from "react";
-import { Button, Stepper } from "@mantine/core";
 import {
-  IconBrandDiscordFilled,
   IconBrandYoutubeFilled,
   IconBrowser,
   IconFile,
@@ -11,6 +9,9 @@ import {
   IconRefresh,
   IconScreenShare,
   IconVideo,
+  IconUsers,
+  IconPlayerPlay,
+  IconLock,
 } from "@tabler/icons-react";
 import { NewRoomButton } from "../TopBar/TopBar";
 import styles from "./Home.module.css";
@@ -18,181 +19,133 @@ import { MetadataContext } from "../../MetadataContext";
 
 export const Home = () => {
   const { user } = useContext(MetadataContext);
-  
+
   return (
-    <div>
-      <div className={styles.container}>
-        <Hero
-          heroText="Watch videos together with friends anywhere."
-          subText="No registration or download required."
-          action={
-            <div style={{ marginTop: "8px", width: "300px" }}>
-              <NewRoomButton size="xl" />
-            </div>
-          }
-          image="/screenshot4.png"
-        />
-
-        <div className={styles.featureSection}>
-          <Feature
-            Icon={IconBrowser}
-            title="VBrowser"
-            text="Watch together on a virtual browser running in the cloud."
-          />
-          <Feature
-            Icon={IconBrandYoutubeFilled}
-            title="YouTube"
-            text="Watch videos together from YouTube."
-          />
-          <Feature
-            Icon={IconScreenShare}
-            title="Screensharing"
-            text="Share a browser tab or your desktop."
-          />
-          <Feature
-            Icon={IconFile}
-            title="File"
-            text="Upload and stream your own file."
-          />
-          <Feature
-            Icon={IconLink}
-            title="URL"
-            text="Paste in a video URL for everyone to watch from."
-          />
+    <div className={styles.pageWrapper}>
+      {/* Hero Section */}
+      <div className={styles.heroSection}>
+        <div className={styles.heroGlow} />
+        <div className={styles.heroContent}>
+          <div className={styles.heroBadge}>✦ Free Forever · No Downloads</div>
+          <h1 className={styles.heroHeading}>
+            Watch Together,<br />
+            <span className={styles.heroAccent}>Anywhere.</span>
+          </h1>
+          <p className={styles.heroSubtext}>
+            Sync videos with friends in real time. No lag, no hassle — just hit play.
+          </p>
+          <div className={styles.heroActions}>
+            <NewRoomButton size="xl" />
+          </div>
         </div>
-
-        <Hero
-          heroText="React to moments together."
-          subText="Find moments of shared joy even when you're apart."
-          image="/screenshot18.png"
-          color="green"
-        />
-
-        <div className={styles.featureSection}>
-          <Feature
-            Icon={IconRefresh}
-            title="Synchronized Play"
-            text="Starts, stops, and seeks are synchronized to everyone, so take those restroom and snack breaks without worrying about falling behind."
-          />
-          <Feature
-            Icon={IconMessageFilled}
-            title="Chat"
-            text="Chat with others in your room. Memes and inside jokes encouraged."
-          />
-          <Feature
-            Icon={IconList}
-            title="Playlists"
-            text="Set up a whole list of videos to play next, and rearrange to your heart's content."
-          />
-          <Feature
-            Icon={IconVideo}
-            title="Video chat"
-            text="Jump into video chat if you'd rather be face-to-face."
-          />
+        <div className={styles.heroVisual}>
+          <img src="/screenshot4.png" alt="WatchParty preview" className={styles.heroImage} />
+          <div className={styles.heroImageGlow} />
         </div>
+      </div>
 
-        <Hero
-          heroText="Theater mode."
-          subText="Bring video and chat front-and-center for minimal distractions."
-          image="/screenshot14.png"
-        />
+      {/* Features Grid */}
+      <div className={styles.featuresSection}>
+        <div className={styles.sectionLabel}>What's included</div>
+        <h2 className={styles.sectionTitle}>Everything you need to watch together</h2>
+        <div className={styles.featuresGrid}>
+          <Feature Icon={IconBrowser} title="Virtual Browser" text="Watch on a cloud browser everyone sees at once." accent="#38bdf8" />
+          <Feature Icon={IconBrandYoutubeFilled} title="YouTube" text="Stream any YouTube video in perfect sync." accent="#f87171" />
+          <Feature Icon={IconScreenShare} title="Screenshare" text="Share your tab or desktop with one click." accent="#a78bfa" />
+          <Feature Icon={IconFile} title="Your Files" text="Upload and stream your own video files." accent="#34d399" />
+          <Feature Icon={IconLink} title="Any URL" text="Paste any video URL and watch together." accent="#fbbf24" />
+          <Feature Icon={IconVideo} title="Video Chat" text="Face-to-face while you watch." accent="#f472b6" />
+        </div>
+      </div>
 
-        <div
-          style={{
-            padding: "30px",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-          }}
-        >
-          <div className={styles.heroText}>Get started!</div>
-          <div className={styles.featureSection}>
-            <Stepper active={-1}>
-              <Stepper.Step label="Make a room" />
-              <Stepper.Step label="Share link with friends" />
-              <Stepper.Step label="Pick something to watch" />
-              <Stepper.Step label="Success!" />
-            </Stepper>
+      {/* Sync Section */}
+      <div className={styles.splitSection}>
+        <div className={styles.splitVisual}>
+          <img src="/screenshot18.png" alt="Reactions" className={styles.splitImage} />
+        </div>
+        <div className={styles.splitText}>
+          <div className={styles.sectionLabel}>Real-time reactions</div>
+          <h2 className={styles.splitHeading}>React to moments <span className={styles.heroAccent}>together.</span></h2>
+          <p className={styles.splitBody}>
+            Emoji reactions, live chat, and synchronized playback make every moment feel shared — even when you're miles apart.
+          </p>
+          <div className={styles.splitFeatures}>
+            <div className={styles.splitFeatureItem}><IconRefresh size={18} color="#34d399" /> Instant sync across all viewers</div>
+            <div className={styles.splitFeatureItem}><IconMessageFilled size={18} color="#38bdf8" /> Live chat with emoji reactions</div>
+            <div className={styles.splitFeatureItem}><IconList size={18} color="#a78bfa" /> Shared video playlists</div>
           </div>
         </div>
       </div>
-      <DiscordBot />
-    </div>
-  );
-};
 
-const Feature = ({ Icon, text, title }) => {
-  return (
-    <div
-      style={{
-        display: "flex",
-        flex: "1 1 0px",
-        flexDirection: "column",
-        alignItems: "center",
-        padding: "10px",
-        minWidth: "180px",
-      }}
-    >
-      <Icon size={80} />
-      <h4 className={styles.featureTitle}>{title}</h4>
-      <div className={styles.featureText}>{text}</div>
-    </div>
-  );
-};
-
-export const Hero = ({
-  heroText,
-  subText,
-  subText2,
-  action,
-  image,
-  color,
-}) => {
-  return (
-    <div className={`${styles.hero} ${color === "green" ? styles.green : ""}`}>
-      <div
-        style={{ flexDirection: color === "green" ? "row-reverse" : undefined }}
-        className={styles.heroInner}
-      >
-        <div style={{ padding: "30px", flex: "1 1 0" }}>
-          <div className={styles.heroText}>{heroText}</div>
-          <div className={styles.subText}>{subText}</div>
-          <div className={styles.subText}>{subText2}</div>
-          {action}
+      {/* Theater Section */}
+      <div className={`${styles.splitSection} ${styles.splitReverse}`}>
+        <div className={styles.splitVisual}>
+          <img src="/screenshot14.png" alt="Theater mode" className={styles.splitImage} />
         </div>
-        <div style={{ flex: "1 1 0" }}>
-          <img
-            alt="hero"
-            style={{ width: "100%", borderRadius: "10px" }}
-            src={image}
-          />
+        <div className={styles.splitText}>
+          <div className={styles.sectionLabel}>Immersive experience</div>
+          <h2 className={styles.splitHeading}>Theater mode, <span className={styles.heroAccent}>built in.</span></h2>
+          <p className={styles.splitBody}>
+            Collapse the clutter and bring video and chat front-and-center. Designed for long sessions with friends.
+          </p>
+          <div className={styles.splitFeatures}>
+            <div className={styles.splitFeatureItem}><IconPlayerPlay size={18} color="#fbbf24" /> Distraction-free playback</div>
+            <div className={styles.splitFeatureItem}><IconLock size={18} color="#f87171" /> Room lock & controls</div>
+            <div className={styles.splitFeatureItem}><IconUsers size={18} color="#34d399" /> Multi-viewer support</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Get Started Steps */}
+      <div className={styles.stepsSection}>
+        <div className={styles.sectionLabel}>Quick start</div>
+        <h2 className={styles.sectionTitle}>Up and running in seconds</h2>
+        <div className={styles.stepsGrid}>
+          <StepCard number="01" title="Create a room" text="Hit New Room — it's instant, no account needed." />
+          <StepCard number="02" title="Share the link" text="Send your unique room URL to anyone." />
+          <StepCard number="03" title="Pick a video" text="YouTube, URL, file, or virtual browser." />
+          <StepCard number="04" title="Watch together" text="Everyone stays perfectly in sync, automatically." />
+        </div>
+        <div style={{ marginTop: "40px" }}>
+          <NewRoomButton size="lg" />
         </div>
       </div>
     </div>
   );
 };
 
-export const DiscordBot = () => {
-  return (
-    <div>
-      <Hero
-        color="green"
-        heroText="Add the WatchParty Discord bot to your server to easily generate WatchParty links."
-        subText="/watch to generate a new empty room"
-        subText2="/watch video <URL_HERE> to create a room with a video"
-        action={
-          <Button
-            leftSection={<IconBrandDiscordFilled />}
-            component="a"
-            size="lg"
-            target="_blank"
-            href="https://discord.com/api/oauth2/authorize?client_id=1071394728513380372&permissions=2147485696&scope=bot"
-          >
-            Add to Discord
-          </Button>
-        }
-        image="/screenshot5.png"
-      />
+const Feature = ({ Icon, text, title, accent }) => (
+  <div className={styles.featureCard}>
+    <div className={styles.featureIconWrap} style={{ background: accent + "18", border: `1px solid ${accent}30` }}>
+      <Icon size={28} color={accent} />
     </div>
-  );
-};
+    <h3 className={styles.featureTitle}>{title}</h3>
+    <p className={styles.featureText}>{text}</p>
+  </div>
+);
+
+const StepCard = ({ number, title, text }) => (
+  <div className={styles.stepCard}>
+    <div className={styles.stepNumber}>{number}</div>
+    <h3 className={styles.stepTitle}>{title}</h3>
+    <p className={styles.stepText}>{text}</p>
+  </div>
+);
+
+export const Hero = ({ heroText, subText, subText2, action, image, color }) => (
+  <div className={`${styles.hero} ${color === "green" ? styles.green : ""}`}>
+    <div style={{ flexDirection: color === "green" ? "row-reverse" : undefined }} className={styles.heroInner}>
+      <div style={{ padding: "30px", flex: "1 1 0" }}>
+        <div className={styles.heroText}>{heroText}</div>
+        <div className={styles.subText}>{subText}</div>
+        <div className={styles.subText}>{subText2}</div>
+        {action}
+      </div>
+      <div style={{ flex: "1 1 0" }}>
+        <img alt="hero" style={{ width: "100%", borderRadius: "10px" }} src={image} />
+      </div>
+    </div>
+  </div>
+);
+
+export const DiscordBot = () => null;

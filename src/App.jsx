@@ -1,7 +1,7 @@
 import "@mantine/core/styles.css";
 import "./index.css";
 
-import React, { lazy, Suspense, useState, useEffect } from "react";
+import React, { lazy, Suspense, useState } from "react";
 import { BrowserRouter, Routes, Route, useParams } from "react-router-dom";
 
 import { App } from "./components/App/App";
@@ -20,7 +20,7 @@ const theme = createTheme({
 
 const Debug = lazy(() => import("./components/Debug/Debug"));
 
-// Redirect old-style URLs
+// Redirect old-style hash URLs
 if (window.location.hash && window.location.pathname === "/") {
   const hashRoomId = window.location.hash.substring(1);
   window.location.href = "/watch/" + hashRoomId;
@@ -47,6 +47,7 @@ export const WatchParty = () => {
       <MetadataContext.Provider value={state}>
         <BrowserRouter>
           <Routes>
+
             <Route
               path="/"
               element={
@@ -58,57 +59,67 @@ export const WatchParty = () => {
               }
             />
 
-            <Route path="/create" element={<Create />} />
+            <Route
+              path="/create"
+              element={<Create />}
+            />
 
-            <Route path="/watch/:roomId" element={<WatchWrapper />} />
+            <Route
+              path="/watch/:roomId"
+              element={<WatchWrapper />}
+            />
 
-            <Route path="/r/:vanity" element={<VanityWrapper />} />
+            <Route
+              path="/r/:vanity"
+              element={<VanityWrapper />}
+            />
 
             <Route
               path="/terms"
               element={
-                <>
+                <React.Fragment>
                   <TopBar />
                   <Terms />
                   <Footer />
-                </>
+                </React.Fragment>
               }
             />
 
             <Route
               path="/privacy"
               element={
-                <>
+                <React.Fragment>
                   <TopBar />
                   <Privacy />
                   <Footer />
-                </>
+                </React.Fragment>
               }
             />
 
             <Route
               path="/faq"
               element={
-                <>
+                <React.Fragment>
                   <TopBar />
                   <FAQ />
                   <Footer />
-                </>
+                </React.Fragment>
               }
             />
 
             <Route
               path="/debug"
               element={
-                <>
+                <React.Fragment>
                   <TopBar />
                   <Suspense fallback={null}>
                     <Debug />
                   </Suspense>
                   <Footer />
-                </>
+                </React.Fragment>
               }
             />
+
           </Routes>
         </BrowserRouter>
       </MetadataContext.Provider>
